@@ -1,19 +1,54 @@
 import openpyxl, os
+import pprint
 
+# recipesData = {'recipeName': {'recipeWeight': recipeWeight, 'recipePrice': recipePrice, 'recipeCalories100': recipeCalories100}}
 recipesData = {}
+
+recipesListWb = openpyxl.load_workbook('список рецептів.xlsx')
+recipesListSheet = recipesListWb.active
+
+recipesListRow = 2
+for recipe in os.listdir():
+    if recipe.startswith('рецепт'):
+        recipeWb = openpyxl.load_workbook(recipe)
+        recipeSheet = recipeWb.active
+
+        recipeName = recipe[:-5]
+        recipeWeight = recipeSheet.cell(row=2, column=2).value
+        recipePrice = recipeSheet.cell(row=2, column=3).value
+        recipeCaloriesReal = recipeSheet.cell(row=2, column=4).value
+        recipePrice100 = recipeSheet.cell(row=2, column=3).value / recipeWeight * 100
+        recipeCalories100 = recipeSheet.cell(row=2, column=4).value / recipeWeight * 100
+
+        recipesListSheet.cell(row=recipesListRow, column=1).value = recipeName
+        recipesListSheet.cell(row=recipesListRow, column=2).value = recipeWeight
+        recipesListSheet.cell(row=recipesListRow, column=3).value = recipePrice
+        recipesListSheet.cell(row=recipesListRow, column=4).value = recipeCaloriesReal
+        recipesListSheet.cell(row=recipesListRow, column=5).value = recipePrice100
+        recipesListSheet.cell(row=recipesListRow, column=6).value = recipeCalories100
+        recipesListRow += 1
+
+recipesListWb.save('список рецептів.xlsx')
+
+"""recipesData.setdefault(recipeName[:-5], {'recipeWeight': 0, 'recipePrice': 0, 'recipeCalories100': 0})
+        recipesData[recipeName[:-5]]['recipeWeight'] = recipeWeight
+        recipesData[recipeName[:-5]]['recipePrice'] = recipePrice
+        recipesData[recipeName[:-5]]['recipeCalories100'] = recipeCalories100
+"""
 
 """for menu in os.listdir():
     if menu.startswith('меню'):
         menuWb = openpyxl.load_workbook(f'{menu}.xlsx')
         menuSheet = menuWb.active
 
-        total_menu_weight = 0  # recipeSheet.cell(row=2, column=2).value
-        total_menu_cost = 0
-        total_menu_caloriesReal = 0
+        per_person_menu_weight = 0
+        per_person_cost = 0
+        per_person_caloriesReal = 0
 
         for menu_recipe in range(5, menuSheet.max_row + 1):
+
             menu_recipe_portion_weight = menuSheet.cell(row=menu_recipe, column=2).value
-            menu_recipe_price = productsData[recipeSheet.cell(row=recipe_product, column=1).value]['price']
+            menu_recipe_price = menuSheet.cell(row=menu_recipe, column=2).value
             menu_recipe_calories100 = productsData[recipeSheet.cell(row=recipe_product, column=1).value]['calories']
 
             recipe_product_cost = recipe_product_price * recipe_product_weight / 1000
