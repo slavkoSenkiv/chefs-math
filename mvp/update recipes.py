@@ -2,7 +2,7 @@ import openpyxl, os
 from pathlib import Path
 
 # calculate each recipe item cost based on product sheet
-productWb = openpyxl.load_workbook('продукти.xlsx')
+productWb = openpyxl.load_workbook('список продуктів.xlsx.xlsx')
 productSheet = productWb.active
 
 # update product properties data
