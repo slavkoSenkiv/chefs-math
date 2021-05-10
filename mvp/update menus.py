@@ -1,22 +1,38 @@
 import openpyxl, os, pprint
 import productsData
 
-menuRecipesData = {}
+"""menusData = {'menu': 
+                        {'menuRecipes': 
+                                {'menuRecipe1': 
+                                    {'menuRecipeProduct1Weight': 0, 
+                                     'menuRecipeProduct2Weight': 0}, 
+                                 'menuRecipe2': 
+                                    {'menuRecipeProduct3Weight': 0, 
+                                     'menuRecipeProduct4Weight': 0}},
+                         'totalMenuData': 
+                                {'totalMenuPortionsWeight': 0, 
+                                 'totalMenuPrice': 0,
+                                 'totalMenuCalories': 0}}}"""
+
+menusData = {}
+
 
 for menu in os.listdir():
     if menu.startswith('меню'):
-        menuRecipesData.setdefault(menu, {})
+        menusData.setdefault(menu, {'menuRecipes': {}, 'totalMenuData': {'totalMenuPortionsWeight': 0, 'totalMenuPrice': 0, 'totalMenuCalories': 0}})
         menuWb = openpyxl.load_workbook(menu)
         menuWbSheet = menuWb.active
 
         for menu_recipes in range(5, menuWbSheet.max_row + 1):
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            menuRecipesData[menu].setdefault(menuRecipeName, {})
+            menusData[menu]['menuRecipes'].setdefault(menuRecipeName, {})
             menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
             menuRecipeWbSheet = menuRecipeWb.active
-            menuRecipeWbSheet.cell()
 
-print(pprint.pformat(menuRecipesData))
+            for recipeProducts in range(4, menuRecipeWbSheet.max_row + 1):
+                menusData[menu]['menuRecipes'][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value)
+
+print(pprint.pformat(menusData))
 
 
 
