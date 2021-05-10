@@ -1,8 +1,9 @@
 import openpyxl, os
 from pathlib import Path
+import pprint
 
 # calculate each recipe item cost based on product sheet
-productWb = openpyxl.load_workbook('список продуктів.xlsx.xlsx')
+productWb = openpyxl.load_workbook('список продуктів.xlsx')
 productSheet = productWb.active
 
 # update product properties data
@@ -25,7 +26,7 @@ for recipe in os.listdir(Path.cwd()):
         recipeWb = openpyxl.load_workbook(recipe)
         recipeSheet = recipeWb.active
 
-        total_recipe_weight = 0 # recipeSheet.cell(row=2, column=2).value
+        total_recipe_weight = 0  # recipeSheet.cell(row=2, column=2).value
         total_recipe_cost = 0
         total_recipe_caloriesReal = 0
 
@@ -59,3 +60,7 @@ for recipe in os.listdir(Path.cwd()):
             recipeSheet.cell(row=recipe_product, column=9).value = recipe_product_caloriesReal_percent
 
         recipeWb.save(recipe)
+
+productsDataDoc = open('productsData.py', 'w', encoding='utf-8')
+productsDataDoc.write('productsDataDoc = ' + pprint.pformat(productsData))
+productsDataDoc.close()

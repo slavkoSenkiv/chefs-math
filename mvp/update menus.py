@@ -1,15 +1,22 @@
-import openpyxl, os
+import openpyxl, os, pprint
+import productsData
 
 menuRecipesData = {}
 
 for menu in os.listdir():
     if menu.startswith('меню'):
+        menuRecipesData.setdefault(menu, {})
         menuWb = openpyxl.load_workbook(menu)
         menuWbSheet = menuWb.active
-        for menu_recipes in range(5, menuWbSheet.max_row + 1):
-            menuRecipeSheetName = f'{menuWbSheet.cell(row=menu_recipes, column=1).value}.xlsx'
-            menuRecipeWb = openpyxl.load_workbook(menuRecipeSheetName)
 
+        for menu_recipes in range(5, menuWbSheet.max_row + 1):
+            menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
+            menuRecipesData[menu].setdefault(menuRecipeName, {})
+            menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
+            menuRecipeWbSheet = menuRecipeWb.active
+            menuRecipeWbSheet.cell()
+
+print(pprint.pformat(menuRecipesData))
 
 
 
