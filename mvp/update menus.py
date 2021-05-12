@@ -1,5 +1,4 @@
 import openpyxl, os, pprint
-import productsData
 
 """
 menusData = {'menu': {'menuRecipes': {'menuRecipe1': {'totalRecipeData': {'totalRecipeWeight': 0, 'totalRecipePrice': 0, 'totalRecipeCalories': 0},
@@ -54,6 +53,10 @@ for menu in os.listdir():
         menuWbSheet.cell(row=2, column=4).value = menuCaloriesPerPerson * menuWbSheet.cell(row=1, column=2).value
 
         menuWb.save(menu)
+
+menusDataDoc = open('menusData.py', 'w', encoding='utf-8')
+menusDataDoc.write('menusData = ' + pprint.pformat(menusData))
+menusDataDoc.close()
 
 print(pprint.pformat(menusData))
 
