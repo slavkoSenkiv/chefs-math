@@ -1,10 +1,12 @@
 import openpyxl
 import productsData
+import pprint
 import menusData
 import os
 from openpyxl.styles import Font
 bold = Font(bold=True)
 
+# shoppingListData = {'product1': 0, 'product2': 0}
 shoppingListData = {}
 
 for menu in os.listdir():
@@ -39,15 +41,12 @@ for menu in os.listdir():
         menuWbSheet = menuWb.active
 
         for menuRecipes in range(5, menuWbSheet.max_row + 1):
-            if menuWbSheet.cell(row=menuRecipes, column=1).value in menusData.menusData[menu]:
-                print(menuWbSheet.cell(row=menuRecipes, column=1).value)
-
-
-
-
-
-
-
+            if menuWbSheet.cell(row=menuRecipes, column=1).value in menusData.menusData[menu]:   # if menu recipe name in menuData.menu keys
+                for product in menusData.menusData[menu][menuWbSheet.cell(row=menuRecipes, column=1).value]: # for product name in menuDate.menu.recipeName
+                    shoppingListData.setdefault(product, 0)
+                    shoppingListData[product] += menusData.menusData[menu][menuWbSheet.cell(row=menuRecipes, column=1).value][product]
 
         menuShoppingList.save('тест шопінг  ' + menu)
+
+print(pprint.pformat(shoppingListData))
 
