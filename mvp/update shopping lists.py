@@ -5,6 +5,8 @@ import os
 from openpyxl.styles import Font
 bold = Font(bold=True)
 
+shoppingListData = {}
+
 for menu in os.listdir():
     if menu.startswith('меню'):
         menuShoppingList = openpyxl.Workbook()
@@ -37,7 +39,7 @@ for menu in os.listdir():
         menuWbSheet = menuWb.active
 
         for menuRecipes in range(5, menuWbSheet.max_row + 1):
-            if menuWbSheet.cell(row=menuRecipes, column=1).value in menusData[menu]:
+            if menuWbSheet.cell(row=menuRecipes, column=1).value in menusData.menusData[menu]:
                 print(menuWbSheet.cell(row=menuRecipes, column=1).value)
 
 

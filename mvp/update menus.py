@@ -1,16 +1,15 @@
 import openpyxl, os, pprint
 
 """
-menusData = {'menu': {'menuRecipes': {'menuRecipe1': {'totalRecipeData': {'totalRecipeWeight': 0, 'totalRecipePrice': 0, 'totalRecipeCalories': 0},
-                                                      'recipeProducts':  {'menuRecipeProduct1Weight': 0, 'menuRecipeProduct2Weight': 0}}}
+menusData = {'menu1': {'menuRecipe1': {'product1': 0, 'product2': 0}, 
+                       'menuRecipe2': {'product2': 0, 'product3': 0}}                                                     
 """
 
 menusData = {}
 
 for menu in os.listdir():
     if menu.startswith('меню'):
-        menusData.setdefault(menu, {'menuRecipes': {'totalRecipeData': {'totalRecipeWeight': 0, 'totalRecipePrice': 0, 'totalRecipeCalories': 0},
-                                                      'recipeProducts':  {}}})
+        menusData.setdefault(menu, {})
         menuWb = openpyxl.load_workbook(menu)
         menuWbSheet = menuWb.active
 
@@ -19,9 +18,9 @@ for menu in os.listdir():
         menuCaloriesPerPerson = 0
 
         for menu_recipes in range(5, menuWbSheet.max_row + 1):
-            # incremetion in order to get menuWeightPerPerson
-
+            # increment in order to get menuWeightPerPerson
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
+            menusData[menu].setdefault(menuRecipeName, {})
             menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
             menuRecipeWbSheet = menuRecipeWb.active
 
@@ -40,9 +39,8 @@ for menu in os.listdir():
             menuCostPerPerson += menuWbSheet.cell(row=menu_recipes, column=3).value
             menuCaloriesPerPerson += menuWbSheet.cell(row=menu_recipes, column=4).value
 
-
             for recipeProducts in range(4, menuRecipeWbSheet.max_row + 1):
-                menusData[menu]['menuRecipes']['recipeProducts'][menuRecipeWbSheet.cell(row=recipeProducts, column=1).value] = menuRecipeWbSheet.cell(row=recipeProducts, column=2).value
+                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value)
 
         menuWbSheet.cell(row=3, column=2).value = menuWeightPerPerson
         menuWbSheet.cell(row=3, column=3).value = menuCostPerPerson
