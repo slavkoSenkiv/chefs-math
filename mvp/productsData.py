@@ -1,4 +1,4 @@
-productsDataDoc = {' ': {'calories': 0, 'price': 0},
+productsData = {' ': {'calories': 0, 'price': 0},
  'буряк': {'calories': 500, 'price': 8},
  'вода': {'calories': 0, 'price': 0},
  'горошок конс.': {'calories': 100, 'price': 20.5},

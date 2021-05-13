@@ -1,6 +1,7 @@
 import openpyxl, os, pprint
 
-"""
+# how the menu data structure looks like
+""" 
 menusData = {'menu1': {'menuRecipe1': {'product1': 0, 'product2': 0}, 
                        'menuRecipe2': {'product2': 0, 'product3': 0}}                                                     
 """
@@ -9,7 +10,9 @@ menusData = {}
 
 for menu in os.listdir():
     if menu.startswith('меню'):
-        menusData.setdefault(menu, {})
+
+        menusData.setdefault(menu, {})  # set  / menuData => menu / level in menuData structure
+
         menuWb = openpyxl.load_workbook(menu)
         menuWbSheet = menuWb.active
 
@@ -18,9 +21,10 @@ for menu in os.listdir():
         menuCaloriesPerPerson = 0
 
         for menu_recipes in range(5, menuWbSheet.max_row + 1):
-            # increment in order to get menuWeightPerPerson
+
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            menusData[menu].setdefault(menuRecipeName, {})
+            menusData[menu].setdefault(menuRecipeName, {})  # set / menusData[menu] => menuRecipeName / level in menuData structure
+
             menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
             menuRecipeWbSheet = menuRecipeWb.active
 
@@ -40,7 +44,7 @@ for menu in os.listdir():
             menuCaloriesPerPerson += menuWbSheet.cell(row=menu_recipes, column=4).value
 
             for recipeProducts in range(4, menuRecipeWbSheet.max_row + 1):
-                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value)
+                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value / 1000)
 
         menuWbSheet.cell(row=3, column=2).value = menuWeightPerPerson
         menuWbSheet.cell(row=3, column=3).value = menuCostPerPerson

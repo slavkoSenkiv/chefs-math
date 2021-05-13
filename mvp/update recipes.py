@@ -62,5 +62,5 @@ for recipe in os.listdir(Path.cwd()):
         recipeWb.save(recipe)
 
 productsDataDoc = open('productsData.py', 'w', encoding='utf-8')
-productsDataDoc.write('productsDataDoc = ' + pprint.pformat(productsData))
+productsDataDoc.write('productsData = ' + pprint.pformat(productsData))
 productsDataDoc.close()
