@@ -56,12 +56,12 @@ for menu in os.listdir():
         totalShoppingListCost = 0
         totalShoppingListPrice = 0
 
-        """for products in shoppingListData:
+        for products in shoppingListData:
             # product name in shopping list
             menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row + 1, column=1).value = products
 
             # product weight in shopping list
-            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value = shoppingListData[menu][products] * menuWbSheet.cell(row=1, column=2).value / 1000
+            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value = shoppingListData[menu][products]
             totalShoppingListWeight += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value
 
             # product price in shopping list
@@ -70,7 +70,7 @@ for menu in os.listdir():
 
             # product cost in shopping list
             menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=3).value = menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value * productsData.productsData[products]['price'] / 1000
-            totalShoppingListCost += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=3).value"""
+            totalShoppingListCost += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=3).value
 
 
         menuShoppingListSheet['B2'] = totalShoppingListWeight
