@@ -1,83 +1,89 @@
-import openpyxl, os, pprint
+import openpyxl, pprint, productsData, menusData
 from openpyxl.styles import Font
 bold = Font(bold=True)
-import productsData         # products => their prices and calories
-import menusData            # menus => their recipes => their products => products quantity for
 
 # how the shopping list data structure looks like
 """
 shoppingListData = {'menu1': {'product1': 0, 'product2': 0},
                        'menu2': {'product2': 0, 'product3': 0}}
 """
-
 shoppingListData = {}
 
-for menu in os.listdir():
-    if menu.startswith('меню'):
+# building shopping list per menu in menuData
+for menu in menusData.menusData:
 
-        shoppingListData.setdefault(menu, {})
+    shoppingListData.setdefault(menu, {})  # setting up /shoppingListData => Menu/ level in data structure
+    print('menu', menu)
 
-        menuShoppingList = openpyxl.Workbook()
-        menuShoppingListSheet = menuShoppingList.active
+    # creating and setting up template for shopping list per menu
+    menuShoppingList = openpyxl.Workbook()
+    menuShoppingListSheet = menuShoppingList.active
 
-        menuShoppingListSheet['A1'] = 'назва меню'
-        menuShoppingListSheet['B1'] = 'заг кть'
-        menuShoppingListSheet['C1'] = 'заг варт'
-        menuShoppingListSheet['A3'] = 'продукт'
-        menuShoppingListSheet['B3'] = 'к-ть'
-        menuShoppingListSheet['C3'] = 'вартість'
-        menuShoppingListSheet['D3'] = 'ціна'
-        menuShoppingListSheet['E3'] = '% к-ті'
-        menuShoppingListSheet['F3'] = '% вартості'
-        menuShoppingListSheet['G3'] = '% ціни'
-        menuShoppingListSheet['A2'] = menu[:-5]
+    menuShoppingListSheet['A1'] = 'назва меню'
+    menuShoppingListSheet['B1'] = 'заг кть'
+    menuShoppingListSheet['C1'] = 'заг варт'
+    menuShoppingListSheet['A3'] = 'продукт'
+    menuShoppingListSheet['B3'] = 'к-ть'
+    menuShoppingListSheet['C3'] = 'вартість'
+    menuShoppingListSheet['D3'] = 'ціна'
+    menuShoppingListSheet['E3'] = '% вартості'
+    menuShoppingListSheet['F3'] = '% ціни'
+    menuShoppingListSheet['A2'] = menu[:-5]
+    menuShoppingListSheet['A1'].font = bold
+    menuShoppingListSheet['B1'].font = bold
+    menuShoppingListSheet['C1'].font = bold
+    menuShoppingListSheet['A3'].font = bold
+    menuShoppingListSheet['B3'].font = bold
+    menuShoppingListSheet['C3'].font = bold
+    menuShoppingListSheet['D3'].font = bold
+    menuShoppingListSheet['E3'].font = bold
+    menuShoppingListSheet['F3'].font = bold
 
-        menuShoppingListSheet['A1'].font = bold
-        menuShoppingListSheet['B1'].font = bold
-        menuShoppingListSheet['C1'].font = bold
-        menuShoppingListSheet['A3'].font = bold
-        menuShoppingListSheet['B3'].font = bold
-        menuShoppingListSheet['C3'].font = bold
-        menuShoppingListSheet['D3'].font = bold
-        menuShoppingListSheet['E3'].font = bold
-        menuShoppingListSheet['F3'].font = bold
-        menuShoppingListSheet['G3'].font = bold
+    for menuRecipes in menusData.menusData[menu]:
+        print('     menuRecipes', menuRecipes)
+        for product in menusData.menusData[menu][menuRecipes]:
+            print('         product', product)
+            shoppingListData[menu].setdefault(product, 0)
+            shoppingListData[menu][product] += menusData.menusData[menu][menuRecipes][product]
 
-        menuWb = openpyxl.load_workbook(menu)
-        menuWbSheet = menuWb.active
+    menuShoppingList.save('шопінг ' + menu)
 
-        for menuRecipes in range(5, menuWbSheet.max_row + 1):
-            if menuWbSheet.cell(row=menuRecipes, column=1).value in menusData.menusData[menu]:   # if menu recipe name in menuData.menu keys
-                for product in menusData.menusData[menu][menuWbSheet.cell(row=menuRecipes, column=1).value]: # for product name in menuDate.menu.recipeName
-                    shoppingListData[menu].setdefault(product, 0)
-                    shoppingListData[menu][product] += menusData.menusData[menu][menuWbSheet.cell(row=menuRecipes, column=1).value][product]
+    # upper everything is ok _________________________________-
 
-        totalShoppingListWeight = 0
-        totalShoppingListCost = 0
-        totalShoppingListPrice = 0
+for menus in shoppingListData:
+    menuShoppingListWb = openpyxl.load_workbook('шопінг ' + menus)
+    menuShoppingListWbSheet = menuShoppingListWb.active
 
-        for products in shoppingListData:
-            # product name in shopping list
-            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row + 1, column=1).value = products
+    totalShoppingListWeight = 0
+    totalShoppingListCost = 0
+    totalShoppingListPrice = 0
 
-            # product weight in shopping list
-            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value = shoppingListData[menu][products]
-            totalShoppingListWeight += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value
+    for products in shoppingListData[menus]:
+        # product name in shopping list
+        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row + 1, column=1).value = products
 
-            # product price in shopping list
-            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=4).value = productsData.productsData[products]['price']
-            totalShoppingListPrice += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=4).value
+        # product weight in shopping list
+        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=2).value = shoppingListData[menus][products]
+        totalShoppingListWeight += menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=2).value
 
-            # product cost in shopping list
-            menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=3).value = menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=2).value * productsData.productsData[products]['price'] / 1000
-            totalShoppingListCost += menuShoppingListSheet.cell(row=menuShoppingListSheet.max_row, column=3).value
+        # product price in shopping list
+        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=4).value = productsData.productsData[products]['price']
+        totalShoppingListPrice += menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=4).value
 
+        # product cost in shopping list
+        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=3).value = menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=2).value * productsData.productsData[products]['price'] / 1000
+        totalShoppingListCost += menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=3).value
 
-        menuShoppingListSheet['B2'] = totalShoppingListWeight
-        menuShoppingListSheet['C2'] = totalShoppingListCost
-        menuShoppingListSheet['D2'] = totalShoppingListPrice
+    menuShoppingListWbSheet['B2'] = totalShoppingListWeight
+    menuShoppingListWbSheet['C2'] = totalShoppingListCost
+    menuShoppingListWbSheet['D2'] = totalShoppingListPrice
 
-        menuShoppingList.save('тест шопінг  ' + menu)
+    for products in range(4, menuShoppingListWbSheet.max_row + 1):
+        menuShoppingListWbSheet.cell(row=products, column=5).value = menuShoppingListWbSheet.cell(row=products, column=3).value * 100 / totalShoppingListCost
+        menuShoppingListWbSheet.cell(row=products, column=6).value = menuShoppingListWbSheet.cell(row=products, column=4).value * 100 / totalShoppingListPrice
 
-print(pprint.pformat(shoppingListData))
+    menuShoppingListWb.save('шопінг ' + menus)
 
+shoppingListDoc = open('shoppingListData.py', 'w', encoding='utf-8')
+shoppingListDoc.write('shoppingListData = ' + pprint.pformat(shoppingListData))
+shoppingListDoc.close()
