@@ -7,7 +7,6 @@ menusData = {'menu1': {'menuRecipe1': {'product1': 0, 'product2': 0},
              'menu2': {'menuRecipe1': {'product1': 0, 'product2': 0},
                        'menuRecipe3': {'product3': 0, 'product4': 0}}}                                           
 """
-
 menusData = {}
 
 for menu in os.listdir():
@@ -22,7 +21,12 @@ for menu in os.listdir():
         menuCostPerPerson = 0
         menuCaloriesPerPerson = 0
 
-        for menu_recipes in range(5, menuWbSheet.max_row + 1):
+        menuWeightTotal = 0
+        menuCostTotal = 0
+
+        n = 2
+
+        for menu_recipes in range(4, menuWbSheet.max_row + 1):
 
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
             menusData[menu].setdefault(menuRecipeName, {})  # set / menusData[menu] => menuRecipeName / level in menuData structure
@@ -30,31 +34,41 @@ for menu in os.listdir():
             menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
             menuRecipeWbSheet = menuRecipeWb.active
 
+            # write in menusData db
+            # add next level to menusData[menu][menuRecipeName] => menuRecipeProducts as a keys and (these products weight * portions size * guest number / 1000) as values
+            for recipeProducts in range(4, menuRecipeWbSheet.max_row + 1):
+                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+
             # recipe total weight
             recipeTotalWeight = menuRecipeWbSheet.cell(row=2, column=2).value
             # recipe price per 1kg
-            menuWbSheet.cell(row=menu_recipes, column=5).value = 1000 * menuRecipeWbSheet.cell(row=2, column=3).value / recipeTotalWeight
+            menuWbSheet.cell(row=menu_recipes, column=7).value = 1000 * menuRecipeWbSheet.cell(row=2, column=3).value / recipeTotalWeight
             # recipe calories per 100
-            menuWbSheet.cell(row=menu_recipes, column=6).value = 100 * menuRecipeWbSheet.cell(row=2, column=4).value / recipeTotalWeight
+            menuWbSheet.cell(row=menu_recipes, column=8).value = 100 * menuRecipeWbSheet.cell(row=2, column=4).value / recipeTotalWeight
             # menu recipe cost per portion
-            menuWbSheet.cell(row=menu_recipes, column=3).value = menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=menu_recipes, column=5).value / 1000
+            menuWbSheet.cell(row=menu_recipes, column=3).value = menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=menu_recipes, column=7).value / 1000
             # menu recipe calories per portion
-            menuWbSheet.cell(row=menu_recipes, column=4).value = menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=menu_recipes, column=6).value / 100
+            menuWbSheet.cell(row=menu_recipes, column=4).value = menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=menu_recipes, column=8).value / 100
+            # menu recipe weight for all guests
+            menuWbSheet.cell(row=menu_recipes, column=5).value = menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value
+            # menu recipe cost for all guests
+            menuWbSheet.cell(row=menu_recipes, column=6).value = menuWbSheet.cell(row=menu_recipes, column=3).value * menuWbSheet.cell(row=1, column=2).value
 
             menuWeightPerPerson += menuWbSheet.cell(row=menu_recipes, column=2).value
             menuCostPerPerson += menuWbSheet.cell(row=menu_recipes, column=3).value
             menuCaloriesPerPerson += menuWbSheet.cell(row=menu_recipes, column=4).value
+            menuWeightTotal += menuWbSheet.cell(row=menu_recipes, column=5).value
+            menuCostTotal += menuWbSheet.cell(row=menu_recipes, column=6).value
 
-            for recipeProducts in range(4, menuRecipeWbSheet.max_row + 1):
-                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+            # creating individual sheet for every menuRecipe shopping list
+            menuWb.create_sheet(index=n, title=menuRecipeName[7:])
+            n += 1
 
-        menuWbSheet.cell(row=3, column=2).value = menuWeightPerPerson
-        menuWbSheet.cell(row=3, column=3).value = menuCostPerPerson
-        menuWbSheet.cell(row=3, column=4).value = menuCaloriesPerPerson
-
-        menuWbSheet.cell(row=2, column=2).value = menuWeightPerPerson * menuWbSheet.cell(row=1, column=2).value
-        menuWbSheet.cell(row=2, column=3).value = menuCostPerPerson * menuWbSheet.cell(row=1, column=2).value
-        menuWbSheet.cell(row=2, column=4).value = menuCaloriesPerPerson * menuWbSheet.cell(row=1, column=2).value
+        menuWbSheet.cell(row=2, column=2).value = menuWeightPerPerson
+        menuWbSheet.cell(row=2, column=3).value = menuCostPerPerson
+        menuWbSheet.cell(row=2, column=4).value = menuCaloriesPerPerson
+        menuWbSheet.cell(row=2, column=5).value = menuWeightTotal
+        menuWbSheet.cell(row=2, column=6).value = menuCostTotal
 
         menuWb.save(menu)
 
@@ -62,6 +76,5 @@ menusDataDoc = open('menusData.py', 'w', encoding='utf-8')
 menusDataDoc.write('menusData = ' + pprint.pformat(menusData))
 menusDataDoc.close()
 
-print(pprint.pformat(menusData))
 
 
