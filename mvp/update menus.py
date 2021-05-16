@@ -1,4 +1,6 @@
 import openpyxl, os, pprint
+from openpyxl.styles import Font
+bold = Font(bold=True)
 
 # how the menusData structure looks like
 """
@@ -23,8 +25,6 @@ for menu in os.listdir():
 
         menuWeightTotal = 0
         menuCostTotal = 0
-
-        # n = 1
 
         for menu_recipes in range(4, menuWbSheet.max_row + 1):
 
@@ -60,11 +60,6 @@ for menu in os.listdir():
             menuWeightTotal += menuWbSheet.cell(row=menu_recipes, column=5).value
             menuCostTotal += menuWbSheet.cell(row=menu_recipes, column=6).value
 
-
-            # creating individual sheet for every menuRecipe shopping list
-            # menuWb.create_sheet(index=n, title=menuRecipeName[7:])
-            # n += 1
-
         menuWbSheet.cell(row=2, column=2).value = menuWeightPerPerson
         menuWbSheet.cell(row=2, column=3).value = menuCostPerPerson
         menuWbSheet.cell(row=2, column=4).value = menuCaloriesPerPerson
@@ -76,6 +71,30 @@ for menu in os.listdir():
         for sheets in menuWb:
             if sheets != firstSheet:
                 menuWb.remove(sheets)
+
+        # create sheet shopping list  per recipe by default or per custom grouped recipes
+        n = 1
+        for menu_recipes in range(4, menuWbSheet.max_row + 1):
+            menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
+            menuWb.create_sheet(index=n, title=menuRecipeName[7:])
+            n += 1
+
+        for sheets in menuWb:
+            if sheets != firstSheet:
+                sheets['A1'] = 'назва групи'
+                sheets['A2'] = 'продукт'
+                sheets['B2'] = 'к-ть'
+                sheets['A1'].font = bold
+                sheets['A2'].font = bold
+                sheets['B2'].font = bold
+                for menu_recipes in range(4, menuWbSheet.max_row + 1):
+                    print(sheets)
+                    print(menuWbSheet.cell(row=menu_recipes, column=1).value[7:])
+                    if menuWb.get_sheet_by_name == menuWbSheet.cell(row=menu_recipes, column=1).value[7:]:
+                        print('yes')
+                    else:
+                        print('no')
+
 
         menuWb.save(menu)
 
