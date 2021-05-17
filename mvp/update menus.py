@@ -73,28 +73,25 @@ for menu in os.listdir():
                 menuWb.remove(sheets)
 
         # create sheet shopping list  per recipe by default or per custom grouped recipes
-        n = 1
+        a = 1
         for menu_recipes in range(4, menuWbSheet.max_row + 1):
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            menuWb.create_sheet(index=n, title=menuRecipeName[7:])
-            n += 1
+            menuWb.create_sheet(index=a, title=menuRecipeName[7:])
+            a += 1
+            menuWbRecipeShoppingSheet = menuWb[f'{menuRecipeName[7:]}']
+            menuWbRecipeShoppingSheet['A1'] = 'назва групи'
+            menuWbRecipeShoppingSheet['A2'] = 'продукт'
+            menuWbRecipeShoppingSheet['B1'] = menuRecipeName[7:]
+            menuWbRecipeShoppingSheet['B2'] = 'к-ть'
+            menuWbRecipeShoppingSheet['A1'].font = bold
+            menuWbRecipeShoppingSheet['A2'].font = bold
+            menuWbRecipeShoppingSheet['B2'].font = bold
 
-        for sheets in menuWb:
-            if sheets != firstSheet:
-                sheets['A1'] = 'назва групи'
-                sheets['A2'] = 'продукт'
-                sheets['B2'] = 'к-ть'
-                sheets['A1'].font = bold
-                sheets['A2'].font = bold
-                sheets['B2'].font = bold
-                for menu_recipes in range(4, menuWbSheet.max_row + 1):
-                    print(sheets)
-                    print(menuWbSheet.cell(row=menu_recipes, column=1).value[7:])
-                    if menuWb.get_sheet_by_name == menuWbSheet.cell(row=menu_recipes, column=1).value[7:]:
-                        print('yes')
-                    else:
-                        print('no')
-
+            b = 3
+            for products in menusData[menu][menuRecipeName]:
+                menuWbRecipeShoppingSheet.cell(row=b, column=1).value = products
+                menuWbRecipeShoppingSheet.cell(row=b, column=2).value = menusData[menu][menuRecipeName][products]
+                b += 1
 
         menuWb.save(menu)
 
