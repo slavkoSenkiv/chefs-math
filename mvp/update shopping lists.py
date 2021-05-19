@@ -71,7 +71,7 @@ for menus in shoppingListData:
         totalShoppingListPrice += menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=4).value
 
         # product cost in shopping list
-        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=3).value = menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=2).value * productsData.productsData[products]['price'] / 1000
+        menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=3).value = round(menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=2).value * productsData.productsData[products]['price'] / 1000, 1)
         totalShoppingListCost += menuShoppingListWbSheet.cell(row=menuShoppingListWbSheet.max_row, column=3).value
 
     menuShoppingListWbSheet['B2'] = totalShoppingListWeight
@@ -79,8 +79,8 @@ for menus in shoppingListData:
     menuShoppingListWbSheet['D2'] = totalShoppingListPrice
 
     for products in range(4, menuShoppingListWbSheet.max_row + 1):
-        menuShoppingListWbSheet.cell(row=products, column=5).value = menuShoppingListWbSheet.cell(row=products, column=3).value * 100 / totalShoppingListCost
-        menuShoppingListWbSheet.cell(row=products, column=6).value = menuShoppingListWbSheet.cell(row=products, column=4).value * 100 / totalShoppingListPrice
+        menuShoppingListWbSheet.cell(row=products, column=5).value = round(menuShoppingListWbSheet.cell(row=products, column=3).value * 100 / totalShoppingListCost)
+        menuShoppingListWbSheet.cell(row=products, column=6).value = round(menuShoppingListWbSheet.cell(row=products, column=4).value * 100 / totalShoppingListPrice)
 
     menuShoppingListWb.save('шопінг ' + menus)
 
