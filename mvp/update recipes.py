@@ -2,12 +2,12 @@ import openpyxl, os
 from pathlib import Path
 import pprint
 
-# calculate each recipe item cost based on product sheet
+# update productsData
+productsData = {}
 productWb = openpyxl.load_workbook('список продуктів.xlsx')
 productSheet = productWb.active
-
-# update product properties data
-""" # how productsData structure looks like
+""" 
+# how productsData structure looks like
 productsData = {'product_name': 
                     {'product_unit': str, 
                      'product_unit_weight': int, 
@@ -15,14 +15,12 @@ productsData = {'product_name':
                      'product_calories': int, 
                      'product_netWeightPercent': int}}
 """
-productsData = {}
+
 for products in range(2, productSheet.max_row + 1):
     product_name = productSheet['A' + str(products)].value
-    product_unit = productSheet['B' + str(products)].value
-    product_unit_weight = productSheet['C' + str(products)].value
-    product_price = productSheet['D' + str(products)].value
-    product_calories = productSheet['E' + str(products)].value
-    product_netWeightPercent = productSheet['F' + str(products)].value
+    product_price = productSheet['B' + str(products)].value
+    product_calories = productSheet['C' + str(products)].value
+    product_netWeightPercent = productSheet['D' + str(products)].value
 
     # make sure the key for this product exists
     productsData.setdefault(product_name, {'price': 0, 'calories': 0, 'netWeightPercent': 0})
