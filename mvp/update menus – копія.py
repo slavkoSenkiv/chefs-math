@@ -1,6 +1,7 @@
 import openpyxl, os, pprint
 from openpyxl.styles import Font
 bold = Font(bold=True)
+# my notes/don't mind: last letter for iterations is 'c'
 
 # how the menusData structure looks like
 """
@@ -26,10 +27,17 @@ for menu in os.listdir():
         menuWeightTotal = 0
         menuCostTotal = 0
 
+        c = 1
         for menu_recipes in range(4, menuWbSheet.max_row + 1):
-
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            menusData[menu].setdefault(menuRecipeName, {})  # set / menusData[menu] => menuRecipeName / level in menuData structure
+            # add recipe name level to menusData db
+            # next 'if' section is here in case menu has few same recipes
+            if menuRecipeName in menusData[menu]:
+                print(f'this {menuRecipeName} already in menusData db so we add {menuRecipeName + str(c)}')
+                menusData[menu].setdefault(menuRecipeName + str(c), {})
+                c += 1
+            else:
+                menusData[menu].setdefault(menuRecipeName, {})
 
             menuRecipeWb = openpyxl.load_workbook(menuRecipeName + '.xlsx')
             menuRecipeWbSheet = menuRecipeWb.active
@@ -38,7 +46,8 @@ for menu in os.listdir():
             # add next level to menusData[menu][menuRecipeName] => menuRecipeProducts as a keys and (these products weight * portions size * guest number / 1000) as values
             for recipeProducts in range(5, menuRecipeWbSheet.max_row + 1):
                 # menusData[menu][menuRecipeName].setdefault(recipe_product as key, recipe_gross_weight * menu_recipe_portion_size * guest_number / 1000
-                menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+                for menuRecipes in menusData[menu]:
+                    menusData[menu][menuRecipes].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
 
             # recipe total weight
             recipeWeightOutput = menuRecipeWbSheet.cell(row=2, column=2).value
@@ -79,14 +88,16 @@ for menu in os.listdir():
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
             menuWb.create_sheet(index=a, title=menuRecipeName[7:])
             a += 1
-            menuWbRecipeShoppingSheet = menuWb[f'{menuRecipeName[7:]}']
-            menuWbRecipeShoppingSheet['A1'] = 'назва групи'
-            menuWbRecipeShoppingSheet['A2'] = 'продукт'
-            menuWbRecipeShoppingSheet['B1'] = menuRecipeName[7:]
-            menuWbRecipeShoppingSheet['B2'] = 'к-ть'
-            menuWbRecipeShoppingSheet['A1'].font = bold
-            menuWbRecipeShoppingSheet['A2'].font = bold
-            menuWbRecipeShoppingSheet['B2'].font = bold
+            for recipeSheets in menuWb.sheetnames:
+                menuWbRecipeShoppingSheet = menuWb[recipeSheets]
+                menuWbRecipeShoppingSheet['A1'] = 'назва групи'
+                menuWbRecipeShoppingSheet['A2'] = 'продукт'
+                menuWbRecipeShoppingSheet['B1'] = menuRecipeName[7:]
+                menuWbRecipeShoppingSheet['B2'] = 'к-ть'
+                menuWbRecipeShoppingSheet['A1'].font = bold
+                menuWbRecipeShoppingSheet['A2'].font = bold
+                menuWbRecipeShoppingSheet['B2'].font = bold
+
 
             b = 3
             for products in menusData[menu][menuRecipeName]:
