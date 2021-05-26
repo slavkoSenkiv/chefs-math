@@ -82,28 +82,27 @@ for menu in os.listdir():
             if sheets != firstSheet:
                 menuWb.remove(sheets)
 
-        # create sheet shopping list  per recipe by default or per custom grouped recipes
+        # create sheet shopping list  per recipe
         a = 1
-        for menu_recipes in range(4, menuWbSheet.max_row + 1):
-            menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            menuWb.create_sheet(index=a, title=menuRecipeName[7:])
+        for menu_recipes in menusData[menu]:
+            menuWb.create_sheet(index=a, title=menu_recipes[7:])
             a += 1
-            for recipeSheets in menuWb.sheetnames:
-                menuWbRecipeShoppingSheet = menuWb[recipeSheets]
-                menuWbRecipeShoppingSheet['A1'] = 'назва групи'
-                menuWbRecipeShoppingSheet['A2'] = 'продукт'
-                menuWbRecipeShoppingSheet['B1'] = menuRecipeName[7:]
-                menuWbRecipeShoppingSheet['B2'] = 'к-ть'
-                menuWbRecipeShoppingSheet['A1'].font = bold
-                menuWbRecipeShoppingSheet['A2'].font = bold
-                menuWbRecipeShoppingSheet['B2'].font = bold
 
+            # fulfill the default cells in recipeSheets in menuWb except of Sheet1
+            menuWbRecipeShoppingSheet = menuWb[menu_recipes[7:]]
+            menuWbRecipeShoppingSheet['A1'] = 'назва страви'
+            menuWbRecipeShoppingSheet['B1'] = menu_recipes[7:]
+            menuWbRecipeShoppingSheet['A2'] = 'продукт'
+            menuWbRecipeShoppingSheet['B2'] = 'к-ть'
+            menuWbRecipeShoppingSheet['A1'].font = bold
+            menuWbRecipeShoppingSheet['A2'].font = bold
+            menuWbRecipeShoppingSheet['B2'].font = bold
 
-            b = 3
-            for products in menusData[menu][menuRecipeName]:
-                menuWbRecipeShoppingSheet.cell(row=b, column=1).value = products
-                menuWbRecipeShoppingSheet.cell(row=b, column=2).value = menusData[menu][menuRecipeName][products]
-                b += 1
+            d = 3
+            for menu_recipe_products in menusData[menu][menu_recipes]:
+                menuWbRecipeShoppingSheet[f'A{d}'] = menu_recipe_products
+                menuWbRecipeShoppingSheet[f'B{d}'] = menusData[menu][menu_recipes][menu_recipe_products]
+                d += 1
 
         menuWb.save(menu)
 
@@ -111,16 +110,6 @@ menusDataDoc = open('menusData.py', 'w', encoding='utf-8')
 menusDataDoc.write('menusData = ' + pprint.pformat(menusData))
 menusDataDoc.close()
 
-# ________________________________________________________
-for menu in os.listdir():
-    newShoppingListData = {}
-    if menu.startswith('меню'):
-        print(menu)
-        menuWb = openpyxl.load_workbook(menu)  # load every menu excel workbook one by one and then its 1st sheet where is all the menu data
-        for menuWbSheet in menuWb.sheetnames:
-            print(menuWbSheet)
-            # menuRecipeSheet = menuWb[menuWbSheet]
-            # print(menuWbSheet.cell(row=1, column=2).value)
 
 
 
