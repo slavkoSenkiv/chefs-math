@@ -27,14 +27,14 @@ for menu in os.listdir():
         menuWeightTotal = 0
         menuCostTotal = 0
 
-        c = 1
+        # add recipe name level for current menu that loop is working with to menusData db
+        recipeNameIncrement = 1
         for menu_recipes in range(4, menuWbSheet.max_row + 1):
             menuRecipeName = menuWbSheet.cell(row=menu_recipes, column=1).value
-            # add recipe name level to menusData db
             # next 'if' section is here in case menu has few same recipes
             if menuRecipeName in menusData[menu]:
-                menusData[menu].setdefault(menuRecipeName + str(c), {})
-
+                menusData[menu].setdefault(menuRecipeName + str(recipeNameIncrement), {})
+                recipeNameIncrement += 1
             else:
                 menusData[menu].setdefault(menuRecipeName, {})
 
@@ -49,7 +49,7 @@ for menu in os.listdir():
                     menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
                 else:
                     menusData[menu][menuRecipeName + str(c)].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
-            c += 1
+
 
             # recipe total weight
             recipeWeightOutput = menuRecipeWbSheet.cell(row=2, column=2).value
