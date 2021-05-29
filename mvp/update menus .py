@@ -33,9 +33,8 @@ for menu in os.listdir():
             # add recipe name level to menusData db
             # next 'if' section is here in case menu has few same recipes
             if menuRecipeName in menusData[menu]:
-                print(f'this {menuRecipeName} already in menusData db so we add {menuRecipeName + str(c)}')
                 menusData[menu].setdefault(menuRecipeName + str(c), {})
-                c += 1
+
             else:
                 menusData[menu].setdefault(menuRecipeName, {})
 
@@ -46,8 +45,11 @@ for menu in os.listdir():
             # add next level to menusData[menu][menuRecipeName] => menuRecipeProducts as a keys and (these products weight * portions size * guest number / 1000) as values
             for recipeProducts in range(5, menuRecipeWbSheet.max_row + 1):
                 # menusData[menu][menuRecipeName].setdefault(recipe_product as key, recipe_gross_weight * menu_recipe_portion_size * guest_number / 1000
-                for menuRecipes in menusData[menu]:
-                    menusData[menu][menuRecipes].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+                if menuRecipeName in menusData[menu]:
+                    menusData[menu][menuRecipeName].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+                else:
+                    menusData[menu][menuRecipeName + str(c)].setdefault(menuRecipeWbSheet.cell(row=recipeProducts, column=1).value, menuRecipeWbSheet.cell(row=recipeProducts, column=2).value * menuWbSheet.cell(row=menu_recipes, column=2).value * menuWbSheet.cell(row=1, column=2).value / 1000)
+            c += 1
 
             # recipe total weight
             recipeWeightOutput = menuRecipeWbSheet.cell(row=2, column=2).value
